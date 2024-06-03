@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Call Recording</title>
+</head>
+<body>
+    <h1>Call Recording</h1>
+    <input type="text" id="callId" placeholder="Enter Call ID">
+    <input type="text" id="userId" placeholder="Enter User ID">
+    <button onclick="connect()">Connect</button>
+    <button onclick="record()">Record Call</button>
+    <button onclick="getDuration()">Get Call Duration</button>
+    <div id="messages"></div>
+
+    <script>
+        let websocket;
+
+        function connect() {
+            const callId = document.getElementById("callId").value;
+            const userId = document.getElementById("userId").value;
+            websocket = new WebSocket(`ws://localhost:8000/ws/${callId}/${userId}`);
+
+            websocket.onmessage = function(event) {
+                const messages = document.getElementById("messages");
+                const message = document.createElement("div");
+                message.textContent = event.data;
+                messages.appendChild(message);
+            };
+
+            websocket.onclose = function() {
+                alert("Connection closed by server");
+            };
+        }
+
+        function record() {
+            websocket.send("record");
+        }
+
+        function getDuration() {
+            websocket.send("duration");
+        }
+    </script>
+</body>
+</html>
